@@ -1,0 +1,35 @@
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <WebView
+        android:id="@+id/fullscreen_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:isScrollContainer="false"
+        android:requiresFadingEdge="none"
+        tools:context="net.suteren.halauncher.MainActivity">
+
+    </WebView>
+
+
+    <GridView
+        android:id="@+id/menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:choiceMode="singleChoice"
+        android:columnWidth="220dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:horizontalSpacing="8dp"
+        android:numColumns="auto_fit"
+        android:padding="16dp"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="24dp" />
+
+</android.support.v4.widget.DrawerLayout>
