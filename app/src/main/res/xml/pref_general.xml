@@ -19,4 +19,11 @@
         android:summary="@string/pref_description_social_recommendations"
         android:title="@string/pref_title_social_recommendations" />
 
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_time"
+        android:inputType="time"
+        android:key="time"
+        android:selectAllOnFocus="true"
+        android:title="@string/pref_title_time" />
+
 </PreferenceScreen>

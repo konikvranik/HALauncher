@@ -178,6 +178,7 @@ public class SettingsActivity extends PreferenceActivity {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("url"));
+            bindPreferenceSummaryToValue(findPreference("time"));
         }
 
         @Override

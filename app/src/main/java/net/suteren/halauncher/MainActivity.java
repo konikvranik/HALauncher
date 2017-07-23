@@ -3,16 +3,18 @@ package net.suteren.halauncher;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -23,8 +25,7 @@ import android.widget.GridView;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
-import static android.content.Intent.ACTION_MAIN;
-import static android.content.Intent.CATEGORY_LAUNCHER;
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -33,8 +34,6 @@ import static android.content.Intent.CATEGORY_LAUNCHER;
 public class MainActivity extends AppCompatActivity {
 
     public static final String JSCONSOLE = "jsconsole";
-    //    public static final String URL = "http://hadash.home:5050/kuchyne";
-    public static final String URL = "http://hadash.home:5050/loznice?skin=daylight";
     private WebView webView;
 
     @Override
@@ -57,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         });
         setDrawerLeftEdgeSize(this, drawer, 1f);
         setupWebView();
+        registerReceiver(new DayTimeReceiver(this), new IntentFilter(Intent.ACTION_TIME_TICK));
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -139,9 +139,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        webView.loadUrl(getPreferences(MODE_PRIVATE).getString("url", getResources().getString(R.string.pref_default_url)));
+        webView.loadUrl(getDefaultSharedPreferences(this).getString("url", getResources().getString(R.string.pref_default_url)));
         delayedHide();
         webView.resumeTimers();
+        unlockScreen();
+    }
+
+    private void unlockScreen() {
+        Window window = this.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 
     /**

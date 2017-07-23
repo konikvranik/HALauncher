@@ -18,7 +18,7 @@
             android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name=".MainActivity"/>
+                <action android:name=".MainActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.HOME" />
@@ -31,11 +31,16 @@
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name=".SettingsActivity"/>
+                <action android:name=".SettingsActivity" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".DayTimeReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>

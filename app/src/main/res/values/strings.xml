@@ -19,6 +19,9 @@
     <string name="pref_title_display_name">URL</string>
     <string name="pref_default_url">http://hadash.home:5050/loznice?skin=daylight</string>
 
+    <string name="pref_title_time">Wakeup</string>
+    <string name="pref_default_time">06:00:00</string>
+
     <string name="pref_title_add_friends_to_messages">Displayed applications</string>
     <string-array name="pref_example_list_titles">
         <item>Always</item>

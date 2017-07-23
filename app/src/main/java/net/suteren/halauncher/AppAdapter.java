@@ -63,6 +63,8 @@ class AppAdapter extends BaseAdapter {
                 if (o1 == null && o2 == null) return 0;
                 if (o1 == null) return -1;
                 if (o2 == null) return 1;
+                if (context.getPackageName().equals(o1.activityInfo.packageName)) return 1;
+                if (context.getPackageName().equals(o2.activityInfo.packageName)) return -1;
                 if (isSystem(o1) && isSystem(o2)) {
                     return collator.compare(o1.loadLabel(packageManager), o2.loadLabel(packageManager));
                 } else {
