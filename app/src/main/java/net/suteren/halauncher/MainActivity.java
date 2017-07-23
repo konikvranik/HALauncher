@@ -3,35 +3,28 @@ package net.suteren.halauncher;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.ViewDragHelper;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.lang.reflect.Field;
-import java.text.Collator;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
+
+import static android.content.Intent.ACTION_MAIN;
+import static android.content.Intent.CATEGORY_LAUNCHER;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -40,7 +33,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 
     public static final String JSCONSOLE = "jsconsole";
-//    public static final String URL = "http://hadash.home:5050/kuchyne";
+    //    public static final String URL = "http://hadash.home:5050/kuchyne";
     public static final String URL = "http://hadash.home:5050/loznice?skin=daylight";
     private WebView webView;
 
@@ -50,11 +43,17 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        GridView appsView = (GridView) findViewById(R.id.menu);
-        appsView.setAdapter(new AppAdapter());
+        final GridView appsView = (GridView) findViewById(R.id.menu);
+        AppAdapter adapter = new AppAdapter(this);
+        appsView.setAdapter(adapter);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                ((AppAdapter) appsView.getAdapter()).updateActs();
+            }
         });
         setDrawerLeftEdgeSize(this, drawer, 1f);
         setupWebView();
@@ -138,19 +137,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
-        //delayedHide();
-        webView.loadUrl(URL);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
+        webView.loadUrl(getPreferences(MODE_PRIVATE).getString("url", getResources().getString(R.string.pref_default_url)));
         delayedHide();
         webView.resumeTimers();
     }
@@ -175,82 +164,5 @@ public class MainActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
-    private class AppAdapter extends BaseAdapter {
 
-        final List<ApplicationInfo> apps;
-        final PackageManager packageManager = getApplicationContext().getPackageManager();
-        final Collator collator = Collator.getInstance();
-
-        AppAdapter() {
-            apps = getApplicationContext().getPackageManager().getInstalledApplications(PackageManager.GET_META_DATA);
-            Iterator<ApplicationInfo> it = apps.iterator();
-            while (it.hasNext()) {
-                if (packageManager.getLaunchIntentForPackage(it.next().packageName) == null) {
-                    it.remove();
-                }
-            }
-            Collections.sort(apps, new Comparator<ApplicationInfo>() {
-                @Override
-                public int compare(ApplicationInfo o1, ApplicationInfo o2) {
-                    if (o1 == null && o2 == null) return 0;
-                    if (o1 == null) return -1;
-                    if (o2 == null) return 1;
-                    if (isSystem(o1) && isSystem(o2)) {
-                        return collator.compare(packageManager.getApplicationLabel(o1), packageManager.getApplicationLabel(o2));
-                    } else {
-                        return Boolean.compare(isSystem(o2), isSystem(o1));
-                    }
-                }
-            });
-        }
-
-        private boolean isSystem(ApplicationInfo o1) {
-            return 0 == (o1.flags & ApplicationInfo.FLAG_SYSTEM);
-        }
-
-        @Override
-        public int getCount() {
-            return apps.size();
-        }
-
-        @Override
-        public ApplicationInfo getItem(int position) {
-            return apps.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return getItem(position).uid;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = View.inflate(getApplicationContext(), R.layout.app_info, null);
-            }
-
-            final ApplicationInfo appInfo = getItem(position);
-            try {
-                ((ImageView) convertView.findViewById(R.id.icon)).setImageDrawable(packageManager.getApplicationIcon(appInfo.packageName));
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.w("applist", e);
-            }
-
-            ((TextView) convertView.findViewById(R.id.name)).setText(packageManager.getApplicationLabel(appInfo));
-
-            View.OnClickListener onClick = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent launchIntentForPackage = packageManager.getLaunchIntentForPackage(appInfo.packageName);
-                    if (launchIntentForPackage == null) {
-                        apps.remove(appInfo);
-                    } else {
-                        startActivity(launchIntentForPackage);
-                    }
-                }
-            };
-            convertView.setOnClickListener(onClick);
-            return convertView;
-        }
-    }
 }
