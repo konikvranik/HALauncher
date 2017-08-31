@@ -10,9 +10,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#000000"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:isScrollContainer="false"
+        android:longClickable="false"
+        android:clickable="false"
         android:requiresFadingEdge="none"
-        tools:context="net.suteren.halauncher.MainActivity">
+        android:scrollbars="vertical"
+        android:descendantFocusability="blocksDescendants"
+        tools:context="net.suteren.adapter.MainActivity">
 
     </WebView>
 

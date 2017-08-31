@@ -3,14 +3,13 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="net.suteren.halauncher.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="net.suteren.halauncher.activity.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="net.suteren.halauncher.SettingsActivity$ActivitiesPreferenceFragment"
+        android:fragment="net.suteren.halauncher.activity.SettingsActivity$ActivitiesPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_activities" />
-
 
 </preference-headers>

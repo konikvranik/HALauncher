@@ -26,4 +26,14 @@
         android:selectAllOnFocus="true"
         android:title="@string/pref_title_time" />
 
+    <Preference
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:key="reload"
+        android:title="@string/reload">
+        <intent
+            android:action="reload"
+            android:targetClass="net.suteren.halauncher.activity.MainActivity"
+            android:targetPackage="net.suteren.halauncher" />
+    </Preference>
+
 </PreferenceScreen>
