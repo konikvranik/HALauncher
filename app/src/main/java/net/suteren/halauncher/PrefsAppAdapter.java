@@ -24,6 +24,8 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 class PrefsAppAdapter extends AppAdapter {
 
+    public static final String LAST_RUN_KEY = "lastRun";
+    public static final String TIME_KEY = "time";
     private Set<String> apps = new HashSet<>();
 
     PrefsAppAdapter(Context mainActivity) {

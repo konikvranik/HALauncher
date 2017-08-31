@@ -11,9 +11,8 @@
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
 
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
+    <string name="pref_title_social_recommendations">Enable wakeup</string>
+    <string name="pref_description_social_recommendations">Wakeup every day at specified time
     </string>
 
     <string name="pref_title_display_name">URL</string>

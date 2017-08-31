@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
+import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -34,6 +35,7 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 public class MainActivity extends AppCompatActivity {
 
     public static final String JSCONSOLE = "jsconsole";
+    public static final String JALERT = "jalert";
     private WebView webView;
 
     @Override
@@ -54,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 ((AppAdapter) appsView.getAdapter()).updateActs();
             }
         });
-        setDrawerLeftEdgeSize(this, drawer, 1f);
+        //setDrawerLeftEdgeSize(this, drawer, 1f);
         setupWebView();
         registerReceiver(new DayTimeReceiver(this), new IntentFilter(Intent.ACTION_TIME_TICK));
     }
@@ -94,6 +96,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return true;
             }
+
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+                result.cancel();
+                Log.w(JALERT, url + "|" + message);
+                return true;
+            }
         });
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -127,11 +136,7 @@ public class MainActivity extends AppCompatActivity {
             Point displaySize = new Point();
             activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
             edgeSizeField.setInt(leftDragger, Math.max(edgeSize, (int) (displaySize.x * displayWidthPercentage)));
-        } catch (NoSuchFieldException e) {
-            // ignore
-        } catch (IllegalArgumentException e) {
-            // ignore
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
             // ignore
         }
     }
