@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import static android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP;
 import static android.os.PowerManager.FULL_WAKE_LOCK;
+import static android.os.PowerManager.PARTIAL_WAKE_LOCK;
 import static android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
@@ -45,12 +46,15 @@ public class MainActivity extends AppCompatActivity {
     public static final String RELOAD_ACTION = "reload";
     public static final String WAKEUP_ACTION = "wakeup";
     private WebView webView;
+    private PowerManager.WakeLock partial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        partial = ((PowerManager) getSystemService(POWER_SERVICE))
+                .newWakeLock(PARTIAL_WAKE_LOCK, getClass().getName());
 
         final GridView appsView = (GridView) findViewById(R.id.menu);
         AppAdapter adapter = new AppAdapter(this);
@@ -147,7 +151,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         delayedHide();
-        //webView.resumeTimers();
+        webView.resumeTimers();
+        partial.acquire();
     }
 
     /**
@@ -174,6 +179,9 @@ public class MainActivity extends AppCompatActivity {
     // Called implicitly when device is about to sleep or application is backgrounded
     protected void onPause() {
         super.onPause();
+        if (partial != null) {
+            partial.release();
+        }
     }
 
     // Called whenever we need to wake up the device
@@ -182,6 +190,8 @@ public class MainActivity extends AppCompatActivity {
                 .newWakeLock(SCREEN_BRIGHT_WAKE_LOCK | FULL_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP, getClass().getName());
         try {
             wakelock.acquire();
+            Thread.sleep(700);
+        } catch (InterruptedException e) {
         } finally {
             wakelock.release();
         }
