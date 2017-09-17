@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -186,14 +187,17 @@ public class MainActivity extends AppCompatActivity {
 
     // Called whenever we need to wake up the device
     public void wakeDevice() {
-        PowerManager.WakeLock wakelock = ((PowerManager) getSystemService(POWER_SERVICE))
+        final PowerManager.WakeLock wakelock = ((PowerManager) getSystemService(POWER_SERVICE))
                 .newWakeLock(SCREEN_BRIGHT_WAKE_LOCK | FULL_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP, getClass().getName());
         try {
             wakelock.acquire();
-            Thread.sleep(700);
-        } catch (InterruptedException e) {
         } finally {
-            wakelock.release();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    wakelock.release();
+                }
+            }, 60 * 1000);
         }
     }
 

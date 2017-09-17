@@ -51,7 +51,7 @@ public class DayTimeReceiver extends BroadcastReceiver {
     }
 
     private boolean isMatch(Context context, SharedPreferences prefs, Calendar now) {
-        String nowString = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(now.getTime());
+        String nowString = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(now.getTime());
         return nowString != null && nowString.equals(prefs.getString(TIME_KEY, context.getResources().getString(R.string.pref_default_time)));
     }
 
