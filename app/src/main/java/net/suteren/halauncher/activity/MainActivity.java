@@ -34,6 +34,7 @@ import static android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
 import static android.view.WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
 
 /**
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         partial = ((PowerManager) getSystemService(POWER_SERVICE))
                 .newWakeLock(PARTIAL_WAKE_LOCK, getClass().getName());
+        partial.acquire();
 
         final GridView appsView = (GridView) findViewById(R.id.menu);
         AppAdapter adapter = new AppAdapter(this);
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //setDrawerLeftEdgeSize(this, drawer, 1f);
-        getWindow().addFlags(FLAG_DISMISS_KEYGUARD | FLAG_KEEP_SCREEN_ON | FLAG_TURN_SCREEN_ON);
+        getWindow().addFlags(FLAG_DISMISS_KEYGUARD | FLAG_KEEP_SCREEN_ON | FLAG_TURN_SCREEN_ON | FLAG_SHOW_WHEN_LOCKED);
         setupWebView();
         reloadWeb();
         registerReceiver(new DayTimeReceiver(), new IntentFilter(Intent.ACTION_TIME_TICK));
@@ -153,7 +155,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         delayedHide();
         webView.resumeTimers();
-        partial.acquire();
     }
 
     /**
@@ -171,34 +172,19 @@ public class MainActivity extends AppCompatActivity {
         webView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
-
-    // Called implicitly when device is about to sleep or application is backgrounded
-    protected void onPause() {
-        super.onPause();
-        if (partial != null) {
-            partial.release();
-        }
-    }
-
     // Called whenever we need to wake up the device
     public void wakeDevice() {
+        getWindow().addFlags(FLAG_DISMISS_KEYGUARD | FLAG_KEEP_SCREEN_ON | FLAG_TURN_SCREEN_ON | FLAG_SHOW_WHEN_LOCKED);
         final PowerManager.WakeLock wakelock = ((PowerManager) getSystemService(POWER_SERVICE))
                 .newWakeLock(SCREEN_BRIGHT_WAKE_LOCK | FULL_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP, getClass().getName());
-        try {
-            wakelock.acquire();
-        } finally {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    wakelock.release();
-                }
-            }, 60 * 1000);
-        }
+        wakelock.acquire();
     }
 
     @Override
