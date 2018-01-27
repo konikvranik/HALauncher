@@ -4,9 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -27,11 +28,14 @@ import net.suteren.halauncher.adapter.AppAdapter;
 
 import java.util.Locale;
 
+import static android.net.wifi.WifiManager.WIFI_MODE_FULL;
 import static android.os.PowerManager.ACQUIRE_CAUSES_WAKEUP;
 import static android.os.PowerManager.FULL_WAKE_LOCK;
 import static android.os.PowerManager.PARTIAL_WAKE_LOCK;
 import static android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
+import static android.provider.Settings.Global.WIFI_SLEEP_POLICY;
+import static android.provider.Settings.Global.WIFI_SLEEP_POLICY_NEVER;
 import static android.view.WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
@@ -49,15 +53,15 @@ public class MainActivity extends AppCompatActivity {
     public static final String WAKEUP_ACTION = "wakeup";
     private WebView webView;
     private PowerManager.WakeLock partial;
+    private WifiManager.WifiLock wl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        partial = ((PowerManager) getSystemService(POWER_SERVICE))
-                .newWakeLock(PARTIAL_WAKE_LOCK, getClass().getName());
-        partial.acquire();
+        partial = acquireWakelock(PARTIAL_WAKE_LOCK);
+        wl = acquireWifiLock();
 
         final GridView appsView = (GridView) findViewById(R.id.menu);
         AppAdapter adapter = new AppAdapter(this);
@@ -76,6 +80,15 @@ public class MainActivity extends AppCompatActivity {
         setupWebView();
         reloadWeb();
         registerReceiver(new DayTimeReceiver(), new IntentFilter(Intent.ACTION_TIME_TICK));
+    }
+
+    private WifiManager.WifiLock acquireWifiLock() {
+        Settings.System.putInt(getContentResolver(), WIFI_SLEEP_POLICY, WIFI_SLEEP_POLICY_NEVER);
+        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        assert wifiManager != null;
+        WifiManager.WifiLock fullWifi = wifiManager.createWifiLock(WIFI_MODE_FULL, "fullWifi");
+        fullWifi.acquire();
+        return fullWifi;
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -182,9 +195,17 @@ public class MainActivity extends AppCompatActivity {
     // Called whenever we need to wake up the device
     public void wakeDevice() {
         getWindow().addFlags(FLAG_DISMISS_KEYGUARD | FLAG_KEEP_SCREEN_ON | FLAG_TURN_SCREEN_ON | FLAG_SHOW_WHEN_LOCKED);
-        final PowerManager.WakeLock wakelock = ((PowerManager) getSystemService(POWER_SERVICE))
-                .newWakeLock(SCREEN_BRIGHT_WAKE_LOCK | FULL_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP, getClass().getName());
-        wakelock.acquire();
+        acquireWakelock(SCREEN_BRIGHT_WAKE_LOCK | FULL_WAKE_LOCK | ACQUIRE_CAUSES_WAKEUP);
+    }
+
+    @SuppressLint("WakelockTimeout")
+    private PowerManager.WakeLock acquireWakelock(int levelAndFlags) {
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        assert powerManager != null;
+        PowerManager.WakeLock wakeLock = powerManager
+                .newWakeLock(levelAndFlags, getClass().getName());
+        wakeLock.acquire();
+        return wakeLock;
     }
 
     @Override
