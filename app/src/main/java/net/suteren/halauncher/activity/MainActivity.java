@@ -1,10 +1,12 @@
 package net.suteren.halauncher.activity;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
@@ -150,7 +152,9 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                webView.evaluateJavascript("$('body').css('-webkit-tap-highlight-color', 'rgba(0, 0, 0, 0)')", null);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    webView.evaluateJavascript("$('body').css('-webkit-tap-highlight-color', 'rgba(0, 0, 0, 0)')", null);
+                }
                 super.onPageFinished(view, url);
                 Log.i(JSCONSOLE, "Page finished");
             }
