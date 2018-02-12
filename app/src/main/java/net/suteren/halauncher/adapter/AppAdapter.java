@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,7 +73,11 @@ public class AppAdapter extends BaseAdapter {
                 if (isSystem(o1) && isSystem(o2)) {
                     return collator.compare(o1.loadLabel(packageManager), o2.loadLabel(packageManager));
                 } else {
-                    return Boolean.compare(isSystem(o2), isSystem(o1));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        return Boolean.compare(isSystem(o2), isSystem(o1));
+                    } else {
+                        return 0;
+                    }
                 }
             }
         });
