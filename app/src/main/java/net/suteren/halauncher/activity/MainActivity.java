@@ -93,6 +93,11 @@ public class MainActivity extends AppCompatActivity {
         return fullWifi;
     }
 
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private void setupWebView() {
 
