@@ -1,41 +1,38 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '27.0.3'
-    defaultConfig {
-        applicationId "net.suteren.halauncher"
-        minSdkVersion 16
-       // targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
-    }
-    signingConfigs {
-        release {
-            storeFile file("release.keystore")
-            storePassword "lopata123"
-            keyAlias "halauncher"
-            keyPassword "lopata123"
-        }
-    }
-    buildTypes {
-        release {
-            //minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
-    }
+	compileSdkVersion = 30
+	defaultConfig {
+		applicationId "net.suteren.halauncher"
+		minSdkVersion 16
+        targetSdkVersion 30
+		versionCode 1
+		versionName "1.0"
+		testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+		vectorDrawables.useSupportLibrary = true
+	}
+	signingConfigs {
+		release {
+			storeFile file("release.keystore")
+			storePassword "lopata123"
+			keyAlias "halauncher"
+			keyPassword "lopata123"
+		}
+	}
+	buildTypes {
+		release {
+			minifyEnabled true
+			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+			signingConfig signingConfigs.release
+		}
+	}
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    implementation 'com.android.support:appcompat-v7:25.4.0'
-    implementation 'com.android.support:support-v4:25.4.0'
-    implementation 'com.android.support:support-vector-drawable:25.4.0'
-    testImplementation 'junit:junit:4.12'
+	implementation fileTree(dir: 'libs', include: ['*.jar'])
+	androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+		exclude group: 'com.android.support', module: 'support-annotations'
+	})
+	implementation 'androidx.appcompat:appcompat:1.2.0'
+	testImplementation 'junit:junit:4.12'
 }
