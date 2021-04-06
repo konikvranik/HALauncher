@@ -41,5 +41,4 @@ jobs:
       - name: Archive production artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: release
           path: app/build/outputs/apk/release/*.apk
