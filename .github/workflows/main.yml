@@ -33,5 +33,7 @@ jobs:
 
       - name: "Build Android project"
         uses: vgaidarji/android-github-actions-build@v1.0.1
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         with:
           args: "./gradlew assemble"
