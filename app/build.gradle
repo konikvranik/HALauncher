@@ -13,10 +13,10 @@ android {
 	}
 	signingConfigs {
 		release {
-			storeFile file("release.keystore")
-			storePassword "lopata123"
+			storeFile file("release_keystore.jks")
+			storePassword System.getenv('SIGNING_KEY')
 			keyAlias "halauncher"
-			keyPassword "lopata123"
+			keyPassword System.getenv('SIGNING_KEY')
 		}
 	}
 	buildTypes {
