@@ -37,3 +37,9 @@ jobs:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
         with:
           args: "./gradlew assemble"
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: app/build/outputs/apk/release/app-release.apk
