@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
+import android.net.http.SslError;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.JsResult;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -52,22 +54,20 @@ public class MainActivity extends AppCompatActivity {
 	public static final String RELOAD_ACTION = "reload";
 	public static final String WAKEUP_ACTION = "wakeup";
 	private WebView webView;
-	private PowerManager.WakeLock partial;
-	private WifiManager.WifiLock wl;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		partial = acquireWakelock(PARTIAL_WAKE_LOCK);
-		wl = acquireWifiLock();
+		PowerManager.WakeLock partial = acquireWakelock(PARTIAL_WAKE_LOCK);
+		WifiManager.WifiLock wl = acquireWifiLock();
 
-		final GridView appsView = (GridView) findViewById(R.id.menu);
+		final GridView appsView = findViewById(R.id.menu);
 		AppAdapter adapter = new AppAdapter(this);
 		appsView.setAdapter(adapter);
 
-		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		DrawerLayout drawer = findViewById(R.id.drawer_layout);
 		drawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
 			@Override
 			public void onDrawerClosed(View drawerView) {
@@ -77,6 +77,10 @@ public class MainActivity extends AppCompatActivity {
 		});
 		//setDrawerLeftEdgeSize(this, drawer, 1f);
 		getWindow().addFlags(FLAG_DISMISS_KEYGUARD | FLAG_KEEP_SCREEN_ON | FLAG_TURN_SCREEN_ON | FLAG_SHOW_WHEN_LOCKED);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+			setShowWhenLocked(true);
+			setTurnScreenOn(true);
+		}
 		setupWebView();
 		reloadWeb();
 		registerReceiver(new DayTimeReceiver(), new IntentFilter(Intent.ACTION_TIME_TICK));
@@ -99,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 	@SuppressLint("SetJavaScriptEnabled")
 	private void setupWebView() {
 
-		webView = (WebView) findViewById(R.id.fullscreen_content);
+		webView = findViewById(R.id.fullscreen_content);
 		webView.setBackgroundColor(Color.BLACK);
 		//webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 		webView.setOnTouchListener(new View.OnTouchListener() {
@@ -107,7 +111,9 @@ public class MainActivity extends AppCompatActivity {
 			public boolean onTouch(View v, MotionEvent event) {
 				return (event.getAction() == MotionEvent.ACTION_MOVE);
 			}
+
 		});
+		webView.performClick();
 		webView.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
@@ -167,6 +173,12 @@ public class MainActivity extends AppCompatActivity {
 			public void onLoadResource(WebView view, String url) {
 				super.onLoadResource(view, url);
 				Log.i(JSCONSOLE, "Resource loaded: " + url);
+			}
+
+			@Override
+			public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+				Log.w(JSCONSOLE, "SSL error: " + error);
+				handler.proceed();
 			}
 		});
 	}
